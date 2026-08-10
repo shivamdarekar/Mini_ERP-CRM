@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import { errorHandler } from './common/middleware/error.middleware.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import customerRoutes from './modules/customers/customer.routes.js';
+import productRoutes from './modules/products/product.routes.js';
+import inventoryRoutes from './modules/inventory/inventory.routes.js';
 
 const app = express();
 
@@ -17,6 +19,8 @@ app.use(cookieParser());
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/customers', customerRoutes);
+app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/inventory', inventoryRoutes);
 
 app.use(errorHandler);
 

@@ -2,8 +2,8 @@ import type { Request, Response } from 'express';
 import { asyncHandler } from '../../common/utils/asyncHandler.js';
 import { ApiError } from '../../common/utils/apiError.js';
 import { ApiResponse } from '../../common/utils/apiResponse.js';
-import { loginSchema, registerSchema } from './auth.validation.js';
-import { loginService, registerService, getMeService } from './auth.service.js';
+import { loginSchema } from './auth.validation.js';
+import { loginService, getMeService } from './auth.service.js';
 
 const cookieOptions = {
   httpOnly: true,
@@ -24,15 +24,6 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     .json(new ApiResponse(200, { token, user }, 'Login successful'));
 });
 
-export const register = asyncHandler(async (req: Request, res: Response) => {
-  const parsed = registerSchema.safeParse(req.body);
-  if (!parsed.success) throw new ApiError(400, 'Validation failed', parsed.error.issues);
-
-  const user = await registerService(parsed.data);
-
-  res.status(201).json(new ApiResponse(201, user, 'User registered successfully'));
-});
-
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
   const user = await getMeService(req.user!.userId);
 
@@ -42,6 +33,10 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
 export const logout = asyncHandler(async (_req: Request, res: Response) => {
   res
     .status(200)
-    .clearCookie('token', { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' })
+    .clearCookie('token', {
+      httpOnly: true,
+      sameSite: cookieOptions.sameSite,
+      secure: cookieOptions.secure,
+    })
     .json(new ApiResponse(200, null, 'Logged out successfully'));
 });

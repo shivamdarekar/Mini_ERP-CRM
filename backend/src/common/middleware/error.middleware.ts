@@ -9,14 +9,15 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-  const statusCode = (err as ApiError).statusCode || 500;
+  const statusCode = err instanceof ApiError ? err.statusCode : 500;
   const message = err.message || 'Internal Server Error';
+  const errors = err instanceof ApiError ? err.errors : [];
 
   res.status(statusCode).json({
     success: false,
     statusCode,
     message,
-    errors: (err as ApiError).errors || [],
+    errors,
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 };

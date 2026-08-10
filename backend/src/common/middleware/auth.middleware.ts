@@ -6,16 +6,17 @@ import prisma from '../../config/prisma.js';
 
 export const verifyJWT = asyncHandler(
   async (req: Request, _res: Response, next: NextFunction) => {
-    const token =
-      req.cookies?.token ||
-      req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.cookies?.token || req.header('Authorization')?.replace(/^Bearer\s+/i, '').trim();
 
     if (!token) throw new ApiError(401, 'Unauthorized: Token not provided');
 
     const decoded = verifyToken(token);
+    const userId = typeof decoded?.id === 'string' ? decoded.id : null;
+
+    if (!userId) throw new ApiError(401, 'Unauthorized: Invalid token payload');
 
     const user = await prisma.user.findUnique({
-      where: { id: decoded['id'] },
+      where: { id: userId },
       select: { id: true, email: true, role: true, name: true, isActive: true },
     });
 
@@ -29,6 +30,7 @@ export const verifyJWT = asyncHandler(
       role: user.role,
       name: user.name,
     };
+
     next();
   }
 );

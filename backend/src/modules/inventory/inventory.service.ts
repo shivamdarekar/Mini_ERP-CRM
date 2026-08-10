@@ -395,3 +395,25 @@ export const getLowStockProductsService = async (query: LowStockQueryInput) => {
     handleDbError(error);
   }
 };
+
+export const reduceStockAtomically = async (
+  tx: Prisma.TransactionClient,
+  input: { productId: string; quantity: number }
+) => {
+  const result = await tx.product.updateMany({
+    where: {
+      id: input.productId,
+      isActive: true,
+      currentStock: {
+        gte: input.quantity,
+      },
+    },
+    data: {
+      currentStock: {
+        decrement: input.quantity,
+      },
+    },
+  });
+
+  return result.count;
+};

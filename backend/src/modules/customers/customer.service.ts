@@ -273,3 +273,60 @@ export const getFollowUpsService = async (customerId: string) => {
 		handleDbError(error);
 	}
 };
+
+export const getCustomerActivityService = async (customerId: string) => {
+	try {
+		const customer = await prisma.customer.findUnique({
+			where: { id: customerId },
+			select: {
+				id: true,
+				name: true,
+				mobile: true,
+				email: true,
+				businessName: true,
+				status: true,
+				followUpDate: true,
+				createdAt: true,
+				updatedAt: true,
+				followUpNotes: {
+					orderBy: { createdAt: 'desc' },
+					select: followUpSelect,
+				},
+			},
+		});
+
+		if (!customer) throw new ApiError(404, 'Customer not found');
+
+		const auditLogs = await prisma.auditLog.findMany({
+			where: {
+				entityType: 'CUSTOMER',
+				entityId: customerId,
+			},
+			orderBy: { createdAt: 'desc' },
+			select: {
+				id: true,
+				action: true,
+				entityType: true,
+				entityId: true,
+				description: true,
+				metadata: true,
+				createdAt: true,
+				user: {
+					select: {
+						id: true,
+						name: true,
+						email: true,
+						role: true,
+					},
+				},
+			},
+		});
+
+		return {
+			customer,
+			auditLogs,
+		};
+	} catch (error) {
+		handleDbError(error);
+	}
+};

@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../utils/apiError.js';
+import { env } from '../../config/env.js';
 
 export { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -18,6 +19,6 @@ export const errorHandler = (
     statusCode,
     message,
     errors,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    stack: env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 };

@@ -661,3 +661,60 @@ export const cancelChallanService = async (challanId: string, actorUserId: strin
     handleDbError(error);
   }
 };
+
+export const getChallanHistoryService = async (challanId: string) => {
+  try {
+    const challan = await prisma.challan.findUnique({
+      where: { id: challanId },
+      select: {
+        id: true,
+        challanNumber: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!challan) throw new ApiError(404, 'Challan not found');
+
+    const [auditLogs, stockMovements] = await prisma.$transaction([
+      prisma.auditLog.findMany({
+        where: {
+          entityType: 'CHALLAN',
+          entityId: challanId,
+        },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          action: true,
+          entityType: true,
+          entityId: true,
+          description: true,
+          metadata: true,
+          createdAt: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
+          },
+        },
+      }),
+      prisma.stockMovement.findMany({
+        where: { reason: `Sales Challan ${challan.challanNumber}` },
+        orderBy: { createdAt: 'desc' },
+        select: movementSelect,
+      }),
+    ]);
+
+    return {
+      challan,
+      auditLogs,
+      stockMovements: stockMovements.map((movement) => serializeMovement(movement as Parameters<typeof serializeMovement>[0])),
+    };
+  } catch (error) {
+    handleDbError(error);
+  }
+};

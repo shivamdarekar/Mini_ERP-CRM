@@ -7,6 +7,7 @@ import {
   confirmChallan,
   createChallan,
   getChallanById,
+  getChallanHistory,
   getChallans,
   updateDraftChallan,
 } from './challan.controller.js';
@@ -16,6 +17,7 @@ const router = Router();
 router.use(verifyJWT);
 
 router.get('/', authorizeRoles(ROLES.ADMIN, ROLES.SALES, ROLES.WAREHOUSE, ROLES.ACCOUNTS), getChallans);
+router.get('/:id/history', authorizeRoles(ROLES.ADMIN, ROLES.SALES, ROLES.ACCOUNTS), getChallanHistory);
 router.get('/:id', authorizeRoles(ROLES.ADMIN, ROLES.SALES, ROLES.WAREHOUSE, ROLES.ACCOUNTS), getChallanById);
 router.post('/', authorizeRoles(ROLES.ADMIN, ROLES.SALES), createChallan);
 router.patch('/:id', authorizeRoles(ROLES.ADMIN, ROLES.SALES), updateDraftChallan);

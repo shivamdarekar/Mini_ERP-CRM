@@ -12,16 +12,27 @@ export const verifyJWT = asyncHandler(
 
     const decoded = verifyToken(token);
     const userId = typeof decoded?.id === 'string' ? decoded.id : null;
+    const issuedAt = typeof decoded?.iat === 'number' ? decoded.iat * 1000 : undefined;
 
     if (!userId) throw new ApiError(401, 'Unauthorized: Invalid token payload');
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, role: true, name: true, isActive: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        name: true,
+        isActive: true,
+        passwordChangedAt: true,
+      },
     });
 
     if (!user) throw new ApiError(401, 'Unauthorized: User not found');
     if (!user.isActive) throw new ApiError(403, 'Account is deactivated');
+    if (user.passwordChangedAt && issuedAt && issuedAt < user.passwordChangedAt.getTime()) {
+      throw new ApiError(401, 'Unauthorized: Session has expired');
+    }
 
     req.user = {
       id: user.id,

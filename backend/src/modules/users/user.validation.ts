@@ -15,6 +15,7 @@ export const userIdParamsSchema = z.object({
 
 export const userUpdateSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100).optional(),
+  email: z.string().email('Invalid email address').optional(),
   role: z.nativeEnum(Role).optional(),
   isActive: z.boolean().optional(),
 });

@@ -41,6 +41,9 @@ model User {
   id             String          @id @default(uuid())
   email          String          @unique
   passwordHash   String
+  passwordResetToken        String?   @unique
+  passwordResetExpiresAt     DateTime?
+  passwordChangedAt          DateTime?
   name           String
   role           Role
   isActive       Boolean         @default(true)

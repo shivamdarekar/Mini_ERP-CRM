@@ -1,7 +1,9 @@
 import 'dotenv/config';
 import app from './app.js';
 import prisma from './config/prisma.js';
-const PORT = process.env.PORT || 5000;
+import { env } from './config/env.js';
+
+const PORT = env.PORT;
 const APP_VERSION = '1.0.0';
 
 app.get('/', (_req, res) => {
@@ -30,16 +32,17 @@ const startServer = async () => {
       process.exit(1);
     }
 
-    const BASE_URL = process.env.BACKEND_URL || `http://localhost:${PORT}`;
+    const BASE_URL = env.BACKEND_URL || `http://localhost:${PORT}`;
 
     const server = app.listen(PORT, () => {
       console.log(`
 🚀 ERP-CRM Backend
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 Environment : ${process.env.NODE_ENV || 'development'}
+📍 Environment : ${env.NODE_ENV}
 🔗 Server      : ${BASE_URL}
 ❤️  Health      : ${BASE_URL}/
 📚 API Base    : ${BASE_URL}/api/v1
+📊 Dashboard   : ${BASE_URL}/api/dashboard/overview
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       `);
     });

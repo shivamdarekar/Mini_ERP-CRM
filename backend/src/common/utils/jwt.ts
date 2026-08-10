@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { ApiError } from './apiError.js';
+import { env } from '../../config/env.js';
 
-const SECRET = process.env.JWT_SECRET as string;
-const EXPIRES_IN = (process.env.JWT_EXPIRES_IN as string) || '7d';
+const SECRET = env.JWT_SECRET;
+const EXPIRES_IN = env.JWT_EXPIRES_IN;
 
 export const generateToken = (userId: string): string => {
   if (!SECRET) {

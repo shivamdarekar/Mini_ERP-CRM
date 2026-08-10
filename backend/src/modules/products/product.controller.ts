@@ -30,7 +30,7 @@ export const getProducts = asyncHandler(async (req: Request, res: Response) => {
 
   const result = await getProductsService(parsed.data);
 
-  res.status(200).json(new ApiResponse(200, result, 'Products fetched successfully'));
+  res.status(200).json(new ApiResponse(200, result));
 });
 
 export const getProductById = asyncHandler(async (req: Request, res: Response) => {
@@ -39,7 +39,7 @@ export const getProductById = asyncHandler(async (req: Request, res: Response) =
 
   const product = await getProductByIdService(parsed.data.id);
 
-  res.status(200).json(new ApiResponse(200, product, 'Product fetched successfully'));
+  res.status(200).json(new ApiResponse(200, product));
 });
 
 export const updateProduct = asyncHandler(async (req: Request, res: Response) => {

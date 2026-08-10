@@ -13,6 +13,7 @@ import {
   confirmChallanService,
   createChallanService,
   getChallanByIdService,
+  getChallanHistoryService,
   getChallansService,
   updateDraftChallanService,
 } from './challan.service.js';
@@ -32,7 +33,7 @@ export const getChallans = asyncHandler(async (req: Request, res: Response) => {
 
   const result = await getChallansService(parsed.data);
 
-  res.status(200).json(new ApiResponse(200, result, 'Challans fetched successfully'));
+  res.status(200).json(new ApiResponse(200, result));
 });
 
 export const getChallanById = asyncHandler(async (req: Request, res: Response) => {
@@ -41,7 +42,7 @@ export const getChallanById = asyncHandler(async (req: Request, res: Response) =
 
   const challan = await getChallanByIdService(parsed.data.id);
 
-  res.status(200).json(new ApiResponse(200, challan, 'Challan fetched successfully'));
+  res.status(200).json(new ApiResponse(200, challan));
 });
 
 export const updateDraftChallan = asyncHandler(async (req: Request, res: Response) => {
@@ -72,4 +73,13 @@ export const cancelChallan = asyncHandler(async (req: Request, res: Response) =>
   const challan = await cancelChallanService(parsed.data.id, req.user!.userId);
 
   res.status(200).json(new ApiResponse(200, challan, 'Challan cancelled successfully'));
+});
+
+export const getChallanHistory = asyncHandler(async (req: Request, res: Response) => {
+	const parsed = challanIdParamsSchema.safeParse(req.params);
+	if (!parsed.success) throw new ApiError(400, 'Validation failed', parsed.error.issues);
+
+	const history = await getChallanHistoryService(parsed.data.id);
+
+  res.status(200).json(new ApiResponse(200, history));
 });

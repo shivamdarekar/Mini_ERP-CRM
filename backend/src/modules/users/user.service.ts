@@ -137,13 +137,19 @@ export const updateUserService = async (userId: string, input: UserUpdateInput, 
     return await prisma.$transaction(async (tx) => {
       const existing = await tx.user.findUnique({
         where: { id: userId },
-        select: { id: true, role: true, isActive: true },
+        select: { id: true, email: true, role: true, isActive: true },
       });
 
       if (!existing) throw new ApiError(404, 'User not found');
 
+      if (input.email && input.email !== existing.email) {
+        const emailExists = await tx.user.findUnique({ where: { email: input.email } });
+        if (emailExists) throw new ApiError(409, 'An account with this email already exists.');
+      }
+
       const data: Prisma.UserUpdateInput = {
         ...(input.name !== undefined ? { name: input.name } : {}),
+        ...(input.email !== undefined ? { email: input.email } : {}),
         ...(input.role !== undefined ? { role: input.role } : {}),
         ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
       };
@@ -166,6 +172,38 @@ export const updateUserService = async (userId: string, input: UserUpdateInput, 
         entityType: 'USER',
         entityId: user.id,
         description,
+      });
+
+      return user;
+    });
+  } catch (error) {
+    handleDbError(error);
+  }
+};
+
+export const softDeleteUserService = async (userId: string, actorUserId: string) => {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const existing = await tx.user.findUnique({
+        where: { id: userId },
+        select: { id: true, isActive: true },
+      });
+
+      if (!existing) throw new ApiError(404, 'User not found');
+      if (!existing.isActive) throw new ApiError(409, 'User is already inactive');
+
+      const user = await tx.user.update({
+        where: { id: userId },
+        data: { isActive: false },
+        select: userSelect,
+      });
+
+      await createAuditLog(tx, {
+        userId: actorUserId,
+        action: 'DELETE',
+        entityType: 'USER',
+        entityId: user.id,
+        description: 'User soft deleted',
       });
 
       return user;

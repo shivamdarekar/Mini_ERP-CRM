@@ -41,7 +41,7 @@ export const getMovements = asyncHandler(async (req: Request, res: Response) => 
 
   const result = await getMovementsService(parsed.data);
 
-  res.status(200).json(new ApiResponse(200, result, 'Stock movements fetched successfully'));
+  res.status(200).json(new ApiResponse(200, result));
 });
 
 export const getInventoryProductDetail = asyncHandler(async (req: Request, res: Response) => {
@@ -50,7 +50,7 @@ export const getInventoryProductDetail = asyncHandler(async (req: Request, res: 
 
   const result = await getInventoryProductDetailService(parsed.data.productId);
 
-  res.status(200).json(new ApiResponse(200, result, 'Inventory detail fetched successfully'));
+  res.status(200).json(new ApiResponse(200, result));
 });
 
 export const getLowStockProducts = asyncHandler(async (req: Request, res: Response) => {
@@ -59,5 +59,5 @@ export const getLowStockProducts = asyncHandler(async (req: Request, res: Respon
 
   const result = await getLowStockProductsService(parsed.data);
 
-  res.status(200).json(new ApiResponse(200, result, 'Low-stock products fetched successfully'));
+  res.status(200).json(new ApiResponse(200, result));
 });

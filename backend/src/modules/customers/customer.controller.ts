@@ -12,6 +12,7 @@ import {
 import {
 	addFollowUpService,
 	createCustomerService,
+	getCustomerActivityService,
 	getCustomerByIdService,
 	getCustomersService,
 	getFollowUpsService,
@@ -33,7 +34,7 @@ export const getCustomers = asyncHandler(async (req: Request, res: Response) => 
 
 	const result = await getCustomersService(parsed.data);
 
-	res.status(200).json(new ApiResponse(200, result, 'Customers fetched successfully'));
+	res.status(200).json(new ApiResponse(200, result));
 });
 
 export const getCustomerById = asyncHandler(async (req: Request, res: Response) => {
@@ -42,7 +43,7 @@ export const getCustomerById = asyncHandler(async (req: Request, res: Response) 
 
 	const customer = await getCustomerByIdService(parsed.data.id);
 
-	res.status(200).json(new ApiResponse(200, customer, 'Customer fetched successfully'));
+	res.status(200).json(new ApiResponse(200, customer));
 });
 
 export const updateCustomer = asyncHandler(async (req: Request, res: Response) => {
@@ -75,5 +76,14 @@ export const getFollowUps = asyncHandler(async (req: Request, res: Response) => 
 
 	const followUps = await getFollowUpsService(idParsed.data.id);
 
-	res.status(200).json(new ApiResponse(200, followUps, 'Follow-up notes fetched successfully'));
+	res.status(200).json(new ApiResponse(200, followUps));
+});
+
+export const getCustomerActivity = asyncHandler(async (req: Request, res: Response) => {
+	const idParsed = customerIdParamsSchema.safeParse(req.params);
+	if (!idParsed.success) throw new ApiError(400, 'Validation failed', idParsed.error.issues);
+
+	const activity = await getCustomerActivityService(idParsed.data.id);
+
+	res.status(200).json(new ApiResponse(200, activity));
 });

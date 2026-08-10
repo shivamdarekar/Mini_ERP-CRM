@@ -22,7 +22,13 @@ export const verifyJWT = asyncHandler(
     if (!user) throw new ApiError(401, 'Unauthorized: User not found');
     if (!user.isActive) throw new ApiError(403, 'Account is deactivated');
 
-    req.user = { id: user.id, email: user.email, role: user.role, name: user.name };
+    req.user = {
+      id: user.id,
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+    };
     next();
   }
 );

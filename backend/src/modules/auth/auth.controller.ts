@@ -34,7 +34,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
-  const user = await getMeService(req.user!.id);
+  const user = await getMeService(req.user!.userId);
 
   res.status(200).json(new ApiResponse(200, user, 'Authenticated user'));
 });

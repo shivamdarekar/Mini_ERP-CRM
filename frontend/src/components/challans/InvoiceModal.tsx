@@ -22,11 +22,13 @@ export function InvoiceModal({ challan, open, onClose }: InvoiceModalProps) {
   const grandTotal = subtotal + taxAmount;
 
   const handlePrint = () => {
-    window.print();
+    setTimeout(() => {
+      window.print();
+    }, 100);
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+    <div id="printable-invoice-modal" className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
       {/* Container */}
       <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Top Control Bar (Hidden when printing) */}
@@ -58,7 +60,7 @@ export function InvoiceModal({ challan, open, onClose }: InvoiceModalProps) {
         </div>
 
         {/* Printable Document Area */}
-        <div className="overflow-y-auto p-8 sm:p-10 space-y-8 print:p-0 print:overflow-visible" ref={printRef}>
+        <div id="printable-invoice-content" className="overflow-y-auto p-8 sm:p-10 space-y-8 print:p-0 print:overflow-visible" ref={printRef}>
           {/* Printable Invoice Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start border-b border-slate-200 pb-6 gap-6">
             <div>
@@ -170,29 +172,69 @@ export function InvoiceModal({ challan, open, onClose }: InvoiceModalProps) {
       {/* Embedded CSS for Print Mode */}
       <style>{`
         @media print {
-          body * {
-            visibility: hidden;
+          /* 1. Unclip all fixed-height parent layout containers */
+          html, body, #root, #root > div, main {
+            height: auto !important;
+            min-height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            position: static !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
+
+          /* 2. Hide topbar header, sidebar, toast containers */
+          header, aside, nav, [role="status"] {
+            display: none !important;
+          }
+
+          /* 3. Hide all page content outside of the printable modal */
+          main > div > *:not(#printable-invoice-modal) {
+            display: none !important;
+          }
+
+          /* 4. Hide control bar inside modal (buttons) */
           .print\\:hidden {
             display: none !important;
           }
-          [ref="printRef"], [ref="printRef"] * {
-            visibility: visible;
-          }
-          body {
-            background-color: white !important;
-          }
-          .fixed {
+
+          /* 5. Transform modal to fill standard print page */
+          #printable-invoice-modal {
             position: absolute !important;
-            inset: 0 !important;
-            background: white !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            max-height: none !important;
+            background: #ffffff !important;
             padding: 0 !important;
+            margin: 0 !important;
+            display: block !important;
+            overflow: visible !important;
+            z-index: 999999 !important;
           }
-          .max-w-4xl {
+
+          #printable-invoice-modal > div {
             max-width: 100% !important;
+            width: 100% !important;
             box-shadow: none !important;
             border: none !important;
             border-radius: 0 !important;
+            max-height: none !important;
+            height: auto !important;
+            overflow: visible !important;
+            position: static !important;
+          }
+
+          #printable-invoice-content {
+            padding: 20px !important;
+            margin: 0 !important;
+            overflow: visible !important;
+            display: block !important;
+            background: #ffffff !important;
+            color: #000000 !important;
           }
         }
       `}</style>

@@ -56,6 +56,7 @@ const buildUserWhere = (query: UserListQueryInput): Prisma.UserWhereInput => {
   return where;
 };
 
+//create user service 
 export const createUserService = async (input: RegisterInput, actorUserId: string) => {
   try {
     return await prisma.$transaction(async (tx) => {
@@ -88,6 +89,7 @@ export const createUserService = async (input: RegisterInput, actorUserId: strin
   }
 };
 
+//get user service
 export const getUsersService = async (query: UserListQueryInput) => {
   const skip = (query.page - 1) * query.limit;
 

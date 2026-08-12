@@ -24,6 +24,8 @@ A full-stack enterprise operations portal engineered for a wholesale/distributio
 | **GitHub Repository** | `https://github.com/shivamdarekar/Mini_ERP-CRM` |
 | **REST API Documentation** | [docs/API.md](./docs/API.md) |
 | **System Architecture Specs** | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) |
+| **Postman Collection** | [docs/ERP-CRM.postman_collection.json](./docs/ERP-CRM.postman_collection.json) |
+
 
 ## Demo Credentials
 
